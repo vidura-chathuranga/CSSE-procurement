@@ -1,5 +1,14 @@
-import { useState } from 'react';
-import { createStyles, Navbar, Group, Code,Box, Paper, Text, SimpleGrid } from '@mantine/core';
+import { useState } from "react";
+import {
+  createStyles,
+  Navbar,
+  Group,
+  Code,
+  Box,
+  Paper,
+  Text,
+  SimpleGrid,
+} from "@mantine/core";
 import {
   IconArchive,
   IconAddressBook,
@@ -11,35 +20,38 @@ import {
   IconBuildingSkyscraper,
   IconUserCheck,
   IconNotes,
-} from '@tabler/icons';
+} from "@tabler/icons";
 import Logo from "../../assets/logo.png";
-import ManagerHeader from '../ManagerHeader';
-import ManageMangers from '../ManageMangers';
-import ManageOrders from '../ManageOrders';
-import ManageProducts from '../ManageProducts';
-import ManageSuppliers from '../ManageSuppliers';
-import ManagerSettings from '../ManagerSettings';
-import ManageSites from '../ManageSites';
-import { IconBackhoe , IconCircleCheck } from '@tabler/icons';
-import RecentOrders from '../RecentOrders';
-
+import ManagerHeader from "../ManagerHeader";
+import ManageMangers from "../ManageMangers";
+import ManageOrders from "../ManageOrders";
+import ManageProducts from "../ManageProducts";
+import ManageSuppliers from "../ManageSuppliers";
+import ManagerSettings from "../ManagerSettings";
+import ManageSites from "../ManageSites";
+import { IconBackhoe, IconCircleCheck } from "@tabler/icons";
+import RecentOrders from "../RecentOrders";
 
 //Dashboard styles
 const useStyles = createStyles((theme, _params, getRef) => {
-  const icon = getRef('icon');
+  const icon = getRef("icon");
   return {
     header: {
       paddingBottom: theme.spacing.md,
       marginBottom: theme.spacing.md * 1.5,
       borderBottom: `1px solid ${
-        theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[4]
+          : theme.colors.gray[2]
       }`,
     },
 
     footer: {
       paddingTop: theme.spacing.md,
       borderTop: `1px solid ${
-        theme.colorScheme === 'dark' ? theme.colors.dark[4] : theme.colors.gray[2]
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[4]
+          : theme.colors.gray[2]
       }`,
       marginBottom: theme.spacing.md,
       bottom: 0,
@@ -47,57 +59,71 @@ const useStyles = createStyles((theme, _params, getRef) => {
 
     link: {
       ...theme.fn.focusStyles(),
-      display: 'flex',
-      alignItems: 'center',
-      textDecoration: 'none',
+      display: "flex",
+      alignItems: "center",
+      textDecoration: "none",
       fontSize: theme.fontSizes.sm,
-      color: theme.colorScheme === 'dark' ? theme.colors.dark[1] : theme.colors.gray[7],
+      color:
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[1]
+          : theme.colors.gray[7],
       padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
       borderRadius: theme.radius.sm,
       fontWeight: 500,
-      cursor: 'pointer',
+      cursor: "pointer",
 
-      '&:hover': {
-        backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-        color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+      "&:hover": {
+        backgroundColor:
+          theme.colorScheme === "dark"
+            ? theme.colors.dark[6]
+            : theme.colors.gray[0],
+        color: theme.colorScheme === "dark" ? theme.white : theme.black,
 
         [`& .${icon}`]: {
-          color: theme.colorScheme === 'dark' ? theme.white : theme.black,
+          color: theme.colorScheme === "dark" ? theme.white : theme.black,
         },
       },
     },
 
     linkIcon: {
       ref: icon,
-      color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
+      color:
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[2]
+          : theme.colors.gray[6],
       marginRight: theme.spacing.sm,
     },
 
     linkActive: {
-      '&, &:hover': {
-        backgroundColor: theme.fn.variant({ variant: 'light', color: theme.primaryColor })
-          .background,
-        color: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).color,
+      "&, &:hover": {
+        backgroundColor: theme.fn.variant({
+          variant: "light",
+          color: theme.primaryColor,
+        }).background,
+        color: theme.fn.variant({ variant: "light", color: theme.primaryColor })
+          .color,
         [`& .${icon}`]: {
-          color: theme.fn.variant({ variant: 'light', color: theme.primaryColor }).color,
+          color: theme.fn.variant({
+            variant: "light",
+            color: theme.primaryColor,
+          }).color,
         },
       },
     },
   };
 });
 
-// side nav bar data 
+// side nav bar data
 const data = [
-  { link: '', label: 'Dashboard', icon: IconLayoutDashboard },
-  { link: '', label: 'Orders', icon: IconArticle },
-  { link: '', label: 'Sites', icon: IconArchive },                     
-  { link: '', label: 'Products', icon: IconBuildingSkyscraper },
-  { link: '', label: 'Suppliers', icon: IconAddressBook },
-  { link: '', label: 'Site Managers', icon: IconUserCircle },
+  { link: "", label: "Dashboard", icon: IconLayoutDashboard },
+  { link: "", label: "Purchace Orders", icon: IconArticle },
+  { link: "", label: "Sites", icon: IconArchive },
+  { link: "", label: "Products", icon: IconBuildingSkyscraper },
+  { link: "", label: "Suppliers", icon: IconAddressBook },
+  { link: "", label: "Site Managers", icon: IconUserCircle },
 ];
 
 export const ManagerDashboardComponent: React.FC = () => {
-
   const data = [
     {
       title: "On Going Sites",
@@ -115,7 +141,7 @@ export const ManagerDashboardComponent: React.FC = () => {
       icon: IconUserCheck,
     },
     {
-      title: "Orders",
+      title: "Purchace Orders",
       value: 5,
       icon: IconNotes,
     },
@@ -139,13 +165,13 @@ export const ManagerDashboardComponent: React.FC = () => {
               justifyContent: "center",
               alignItems: "center",
               marginLeft: "20px",
-              textAlign: "center" 
+              textAlign: "center",
             }}
           >
             <Text
               weight={700}
               size="xl"
-              sx={{ fontSize: "4rem", marginBottom: -30, marginTop: -30}}
+              sx={{ fontSize: "4rem", marginBottom: -30, marginTop: -30 }}
             >
               {stat.value}
             </Text>
@@ -167,11 +193,11 @@ export const ManagerDashboardComponent: React.FC = () => {
       }}
     >
       <SimpleGrid
-          cols={4}
-          breakpoints={[{ maxWidth: "sm", cols: 1 }]}
-          sx={{ width: "100%"}}
-        >
-          {stats}
+        cols={4}
+        breakpoints={[{ maxWidth: "sm", cols: 1 }]}
+        sx={{ width: "100%" }}
+      >
+        {stats}
       </SimpleGrid>
       <RecentOrders />
     </Box>
@@ -181,18 +207,21 @@ export const ManagerDashboardComponent: React.FC = () => {
 // Manager dashboard
 const ManagerDashboard: React.FC = () => {
   const { classes, cx } = useStyles();
-  const [active, setActive] = useState('Billing');
+  const [active, setActive] = useState("Billing");
   const [component, setComponent] = useState(
-        <Box>
-          <ManagerHeader componentName="Dashboard" />
-          <Box sx={{ margin: "1%"}}>
-            <ManagerDashboardComponent/>
-          </Box>
-        </Box>);
+    <Box>
+      <ManagerHeader componentName="Dashboard" />
+      <Box sx={{ margin: "1%" }}>
+        <ManagerDashboardComponent />
+      </Box>
+    </Box>
+  );
 
   const links = data.map((item) => (
     <a
-      className={cx(classes.link, { [classes.linkActive]: item.label === active })}
+      className={cx(classes.link, {
+        [classes.linkActive]: item.label === active,
+      })}
       href={item.link}
       key={item.label}
       onClick={(event) => {
@@ -207,25 +236,25 @@ const ManagerDashboard: React.FC = () => {
   ));
 
   const changeComponent = (componentName: string) => {
-    if (componentName === 'Dashboard') {
+    if (componentName === "Dashboard") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Dashboard" />
-          <Box sx={{ margin: "1%"}}>
+          <Box sx={{ margin: "1%" }}>
             <ManagerDashboardComponent />
           </Box>
         </Box>
       );
-    } else if (componentName === 'Orders') {
+    } else if (componentName === "Purchace Orders") {
       setComponent(
         <Box>
-          <ManagerHeader componentName="Orders" />
+          <ManagerHeader componentName="Purchace Orders" />
           <Box>
             <ManageOrders />
           </Box>
         </Box>
       );
-    } else if (componentName === 'Sites') {
+    } else if (componentName === "Sites") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Sites" />
@@ -234,7 +263,7 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === 'Products') {
+    } else if (componentName === "Products") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Products" />
@@ -243,7 +272,7 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === 'Suppliers') {
+    } else if (componentName === "Suppliers") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Suppliers" />
@@ -252,7 +281,7 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === 'Site Managers') {
+    } else if (componentName === "Site Managers") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Site Managers" />
@@ -261,7 +290,7 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === 'Settings') {
+    } else if (componentName === "Settings") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Settings" />
@@ -276,45 +305,48 @@ const ManagerDashboard: React.FC = () => {
   return (
     <Box
       sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "start",
-              width: "100%",
-              height: "100%",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "start",
+        width: "100%",
+        height: "100%",
       }}
-      >
-        <Navbar height={"97vh"} width={{ sm: 300 }} p="md">
-          <Navbar.Section grow>
-            <Group className={classes.header} position="apart">
-              <img src={Logo} alt="Logo" width="150" height="75" />
-              <Code sx={{ fontWeight: 700 }}>v1.0.0</Code>
-            </Group>
-            {links}
-          </Navbar.Section>
+    >
+      <Navbar height={"97vh"} width={{ sm: 300 }} p="md">
+        <Navbar.Section grow>
+          <Group className={classes.header} position="apart">
+            <img src={Logo} alt="Logo" width="150" height="75" />
+            <Code sx={{ fontWeight: 700 }}>v1.0.0</Code>
+          </Group>
+          {links}
+        </Navbar.Section>
 
-          {/* Nav bar setting section  */}
-          <Navbar.Section className={classes.footer}>
-            <p className={classes.link} onClick={() => {
-              changeComponent('Settings');
-            } }>
-              <IconSettings className={classes.linkIcon} stroke={1.5} />
-              <span>Settings</span>
-            </p>
-            <a href="/logout" className={classes.link}>
-              <IconLogout className={classes.linkIcon} stroke={1.5} />
-              <span>Logout</span>
-            </a>
-          </Navbar.Section>
-        </Navbar>
-        <Box
-            sx={{
-                width: "100%",
+        {/* Nav bar setting section  */}
+        <Navbar.Section className={classes.footer}>
+          <p
+            className={classes.link}
+            onClick={() => {
+              changeComponent("Settings");
             }}
-        >
-            {component}
-        </Box>
+          >
+            <IconSettings className={classes.linkIcon} stroke={1.5} />
+            <span>Settings</span>
+          </p>
+          <a href="/logout" className={classes.link}>
+            <IconLogout className={classes.linkIcon} stroke={1.5} />
+            <span>Logout</span>
+          </a>
+        </Navbar.Section>
+      </Navbar>
+      <Box
+        sx={{
+          width: "100%",
+        }}
+      >
+        {component}
+      </Box>
     </Box>
   );
-}
+};
 
 export default ManagerDashboard;

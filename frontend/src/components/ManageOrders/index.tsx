@@ -13,6 +13,11 @@ import {
   Modal,
   Select,
   Badge,
+  Flex,
+  Textarea,
+  Card,
+  NumberInput,
+  ActionIcon,
 } from "@mantine/core";
 import { keys } from "@mantine/utils";
 import {
@@ -27,12 +32,12 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import ManagerAPI from "../../api/ManagerAPI";
 import { IconCheck, IconAlertTriangle } from "@tabler/icons";
 import { useForm } from "@mantine/form";
+import { DatePicker } from "@mantine/dates";
 
 //Interface for order data - (Raw data)
 interface RowData {
   id: string;
-  product: string;
-  quantity: string;
+  products: PurchaceOrderItems[];
   deliveryDate: string;
   site: string;
   status: string;
@@ -42,30 +47,36 @@ interface RowData {
 
 //Interface for manager data - (Raw data)
 interface RowDataManagers {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    role: string;
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
 }
 
 //Interface for site data - (Raw data)
 interface RowDataSites {
-    label: string;
-    value: string;
-  }
+  label: string;
+  value: string;
+}
 
-  //Interface for product data - (Raw data)
+//Interface for product data - (Raw data)
 interface RowDataProducts {
-    label: string;
-    value: string;
-  }
+  label: string;
+  value: string;
+}
+
+//Interface for purchace order items
+export interface PurchaceOrderItems {
+  product: string;
+  quantity: number;
+}
 
 //Get all order records from the database
 const getAllOrders = async () => {
-    const response = await ManagerAPI.getOrders();
-    const data = response.data;
-    return data;
+  const response = await ManagerAPI.getOrders();
+  const data = response.data;
+  return data;
 };
 
 //Get all product records from the database
@@ -77,16 +88,16 @@ const getAllProducts = async () => {
 
 //Get all sites records from the database
 const getAllSites = async () => {
-    const response = await ManagerAPI.getSites();
-    const data = await response.data;
-    return data;
+  const response = await ManagerAPI.getSites();
+  const data = await response.data;
+  return data;
 };
-  
+
 //Get all manager records from the database
 const getAllManagers = async () => {
-    const response = await ManagerAPI.getManagers();
-    const data = await response.data;
-    return data;
+  const response = await ManagerAPI.getManagers();
+  const data = await response.data;
+  return data;
 };
 
 //Stylings
@@ -150,7 +161,9 @@ function Th({ children, reversed, sorted, onSort }: ThProps) {
 function filterData(data: RowData[], search: string) {
   const query = search.toLowerCase().trim();
   return data.filter((item) =>
-    keys(data[0]).some((key) => item[key].toLowerCase().includes(query))
+    keys(data[0]).some((key) =>
+      item[key].toString().toLowerCase().includes(query)
+    )
   );
 }
 
@@ -167,6 +180,7 @@ function sortData(
 
   return filterData(
     [...data].sort((a, b) => {
+      if (sortBy === "products") return 0;
       if (payload.reversed) {
         return b[sortBy].localeCompare(a[sortBy]);
       }
@@ -180,23 +194,32 @@ function sortData(
 // Manage order compoenent
 const ManageOrders: React.FC = () => {
   //holds the order details
-  const [data, setData] = useState<RowData[]>([]);  
+  const [data, setData] = useState<RowData[]>([]);
 
   //controll the loading state of the details
-  const [loading, setLoading] = useState(true);  
+  const [loading, setLoading] = useState(true);
 
   // holds the manager details state
-  const [managers, setManagers] = useState<RowDataManagers[]>([]); 
-  
-  //holds site data state
-  const [sites, setSites] = useState<RowDataSites[]>([]); 
+  const [managers, setManagers] = useState<RowDataManagers[]>([]);
 
-   //holds the product data
+  //holds site data state
+  const [sites, setSites] = useState<RowDataSites[]>([]);
+
+  //holds the product data
   const [products, setProducts] = useState<RowDataProducts[]>([]);
+
+  //Add form purchace order items list
+  const [addFormPurchaceOrderItems, setAddFormPurchaceOrderItems] = useState<
+    PurchaceOrderItems[]
+  >([]);
+
+  //Edit form purchace order items list
+  const [editFormPurchaceOrderItems, setEditFormPurchaceOrderItems] = useState<
+    PurchaceOrderItems[]
+  >([]);
 
   // fetch order data
   useEffect(() => {
-
     // define fetchData function
     const fetchData = async () => {
       showNotification({
@@ -211,14 +234,13 @@ const ManageOrders: React.FC = () => {
       const result = await getAllOrders();
       const data = result.map((item: any) => {
         return {
-            id: item._id,
-            product: item.product,
-            quantity: item.quantity,
-            deliveryDate: item.deliveryDate,
-            site: item.site,
-            status: item.status,
-            specialNotes: item.specialNotes,
-            updatedBy: item.updatedBy,
+          id: item._id,
+          products: item.products,
+          deliveryDate: item.deliveryDate,
+          site: item.site,
+          status: item.status,
+          specialNotes: item.specialNotes,
+          updatedBy: item.updatedBy,
         };
       });
       setData(data);
@@ -226,30 +248,30 @@ const ManageOrders: React.FC = () => {
       const resultManagers = await getAllManagers();
       const managers = resultManagers.map((item: any) => {
         return {
-            id: item._id,
-            name: item.name,
+          id: item._id,
+          name: item.name,
         };
       });
       setManagers(managers);
 
       const resultSites = await getAllSites();
       const sites = resultSites.map((item: any) => {
-          return {
-              label: item.name,
-              value: item._id,
-          };
+        return {
+          label: item.name,
+          value: item._id,
+        };
       });
       setSites(sites);
 
       const resultProducts = await getAllProducts();
       const products = resultProducts.map((item: any) => {
-          return {
-              label: item.name,
-              value: item._id,
-          };
+        return {
+          label: item.name,
+          value: item._id,
+        };
       });
       setProducts(products);
-      
+
       const payload = {
         sortBy: null,
         reversed: false,
@@ -259,13 +281,13 @@ const ManageOrders: React.FC = () => {
       setSortedData(sortData(data, payload));
       setLoading(false);
       updateNotification({
-          id: "loding-data",
-          color: "teal",
-          title: "Data loaded successfully",
-          message:
-              "You can now manage orders by adding, editing or deleting them.",
-          icon: <IconCheck size={16} />,
-          autoClose: 3000,
+        id: "loding-data",
+        color: "teal",
+        title: "Data loaded successfully",
+        message:
+          "You can now manage orders by adding, editing or deleting them.",
+        icon: <IconCheck size={16} />,
+        autoClose: 3000,
       });
     };
 
@@ -283,9 +305,7 @@ const ManageOrders: React.FC = () => {
   //edit order form
   const editOrder = async (values: {
     id: string;
-    product: string;
-    quantity: string;
-
+    products: PurchaceOrderItems[];
     deliveryDate: string;
     site: string;
     status: string;
@@ -311,13 +331,12 @@ const ManageOrders: React.FC = () => {
           if (item.id === values.id) {
             return {
               id: values.id,
-                product: values.product,
-                quantity: values.quantity,
-                deliveryDate: values.deliveryDate,
-                site: values.site,
-                status: values.status,
-                specialNotes: values.specialNotes,
-                updatedBy: values.updatedBy,
+              products: values.products,
+              deliveryDate: values.deliveryDate,
+              site: values.site,
+              status: values.status,
+              specialNotes: values.specialNotes,
+              updatedBy: values.updatedBy,
             };
           } else {
             return item;
@@ -341,27 +360,24 @@ const ManageOrders: React.FC = () => {
       })
       .catch((error) => {
         updateNotification({
-            id: "edit-order",
-            color: "red",
-            title: "Update failed",
-            message: "We were unable to update order data.",
-            icon: <IconAlertTriangle size={16} />,
-            autoClose: 5000,
+          id: "edit-order",
+          color: "red",
+          title: "Update failed",
+          message: "We were unable to update order data.",
+          icon: <IconAlertTriangle size={16} />,
+          autoClose: 5000,
         });
       });
   };
 
   //add order
   const addOrder = async (values: {
-    product: string;
-    quantity: string;
-
+    products: PurchaceOrderItems[];
     deliveryDate: string;
     site: string;
     status: string;
     specialNotes: string;
     updatedBy: string;
-
   }) => {
     showNotification({
       id: "add-order",
@@ -384,8 +400,7 @@ const ManageOrders: React.FC = () => {
           ...data,
           {
             id: response.data._id,
-            product: values.product,
-            quantity: values.quantity,
+            products: values.products,
             deliveryDate: values.deliveryDate,
             site: values.site,
             status: values.status,
@@ -411,12 +426,12 @@ const ManageOrders: React.FC = () => {
       })
       .catch((error) => {
         updateNotification({
-            id: "add-order",
-            color: "red",
-            title: "Add failed",
-            message: "We were unable to add order data.",
-            icon: <IconAlertTriangle size={16} />,
-            autoClose: 5000,
+          id: "add-order",
+          color: "red",
+          title: "Add failed",
+          message: "We were unable to add order data.",
+          icon: <IconAlertTriangle size={16} />,
+          autoClose: 5000,
         });
       });
   };
@@ -466,22 +481,21 @@ const ManageOrders: React.FC = () => {
   const editForm = useForm({
     validateInputOnChange: true,
     initialValues: {
-        id: "",
-        product: "",
-        quantity: "",
-        deliveryDate: "",
-        site: "",
-        status: "",
-        specialNotes: "",
-        updatedBy: "",
+      id: "",
+      products: editFormPurchaceOrderItems,
+      deliveryDate: "",
+      site: "",
+      status: "",
+      specialNotes: "",
+      updatedBy: "",
     },
 
     // edit form validations
     validate: {
-      quantity: (value) => 
-        /^\d+$/.test(value) ? null : "Quantity must be a number",
       deliveryDate: (value) =>
-        /^\d{4}-\d{2}-\d{2}$/.test(value) ? null : "Invalid date - date must be in YYYY-MM-DD format",
+        /^\d{4}-\d{2}-\d{2}$/.test(value)
+          ? null
+          : "Invalid date - date must be in YYYY-MM-DD format",
       specialNotes: (value) =>
         value.length < 2 ? "Special notes must be at least 2 characters" : null,
     },
@@ -491,21 +505,20 @@ const ManageOrders: React.FC = () => {
   const addForm = useForm({
     validateInputOnChange: true,
     initialValues: {
-        product: "",
-        quantity: "",
-        deliveryDate: "",
-        site: "",
-        status: "",
-        specialNotes: "",
-        updatedBy: "",
+      products: addFormPurchaceOrderItems,
+      deliveryDate: "",
+      site: "",
+      status: "PLACED",
+      specialNotes: "",
+      updatedBy: "",
     },
 
     // add order form validations
     validate: {
-      quantity: (value) => 
-        /^\d+$/.test(value) ? null : "Quantity must be a number",
       deliveryDate: (value) =>
-        /^\d{4}-\d{2}-\d{2}$/.test(value) ? null : "Invalid date - date must be in YYYY-MM-DD format",
+        /^\d{4}-\d{2}-\d{2}$/.test(value)
+          ? null
+          : "Invalid date - date must be in YYYY-MM-DD format",
       specialNotes: (value) =>
         value.length < 2 ? "Special notes must be at least 2 characters" : null,
     },
@@ -554,25 +567,32 @@ const ManageOrders: React.FC = () => {
   //create rows
   const rows = sortedData.map((row) => (
     <tr key={row.id}>
-      <td>{row.id.slice(0, 8)}</td>
-      <td>{products.find((product) => product.value === row.product)?.label}</td>
-      <td>{row.quantity}</td>
-      <td>{row.deliveryDate.slice(0, 10)}</td>
+      <td>{row.id.slice(0, 8).toUpperCase()}</td>
       <td>{sites.find((site) => site.value === row.site)?.label}</td>
-      <td>{
-        row.status === "placed" ? (
-            <Badge color="blue">Placed</Badge>
-        ) : row.status === "confirmed" ? (
-            <Badge color="green">Confirmed</Badge>
-        ) : row.status === "dispatched" ? (
-            <Badge color="yellow">Dispatched</Badge>
-        ) : row.status === "delivered" ? (
-            <Badge color="teal">Delivered</Badge>
+      <td>{row.deliveryDate.slice(0, 10)}</td>
+      <td>
+        {row.products?.map((item) => (
+          <div key={item.product}>
+            {products.find((product) => product.value === item.product)?.label}{" "}
+            - {item.quantity}
+          </div>
+        ))}
+      </td>
+      <td>
+        {row.status === "PLACED" ? (
+          <Badge color="blue">Placed</Badge>
+        ) : row.status === "PENDING" ? (
+          <Badge color="orange">Pending</Badge>
+        ) : row.status === "APPROVED" ? (
+          <Badge color="green">Confirmed</Badge>
+        ) : row.status === "DISPATCHED" ? (
+          <Badge color="yellow">Dispatched</Badge>
+        ) : row.status === "DELIVERED" ? (
+          <Badge color="teal">Delivered</Badge>
         ) : (
-            <Badge color="red">Rejected</Badge>
-        )
-        }</td>
-      <td>{row.specialNotes}</td>
+          <Badge color="red">Declined</Badge>
+        )}
+      </td>
       <td>{managers.find((manager) => manager.id === row.updatedBy)?.name}</td>
       <td>
         {/* Order edit button */}
@@ -580,15 +600,15 @@ const ManageOrders: React.FC = () => {
           color="teal"
           leftIcon={<IconEdit size={14} />}
           onClick={() => {
+            setEditFormPurchaceOrderItems(row.products ? row.products : []);
             editForm.setValues({
               id: row.id,
-                product: row.product,
-                quantity: row.quantity,
-                deliveryDate: row.deliveryDate.slice(0, 10),
-                site: row.site,
-                status: row.status,
-                specialNotes: row.specialNotes,
-                updatedBy: row.updatedBy,
+              products: editFormPurchaceOrderItems,
+              deliveryDate: row.deliveryDate.slice(0, 10),
+              site: row.site,
+              status: row.status,
+              specialNotes: row.specialNotes,
+              updatedBy: row.updatedBy,
             });
             setEditOpened(true);
           }}
@@ -612,7 +632,6 @@ const ManageOrders: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-
       {/* Add order form modal */}
       <Modal
         opened={opened}
@@ -620,66 +639,142 @@ const ManageOrders: React.FC = () => {
           addForm.reset();
           setOpened(false);
         }}
-        title="Add Order record"
+        title="Create Purchase Order"
+        size={"xl"}
+        zIndex={2000}
       >
         <form onSubmit={addForm.onSubmit((values) => addOrder(values))}>
-        <Select
-            label="Select product"
-            placeholder="Pick one"
-            searchable
-            nothingFound="No options"
-            data={products}
-            {...addForm.getInputProps("product")}
-            required
-          />
-          <TextInput
-            label="Quantity"
-            placeholder="Enter Quantity"
-            {...addForm.getInputProps("quantity")}
-            required
-          />
-          <TextInput
-            label="Delivery Date"
-            placeholder="Enter Delivery Date"
-            {...addForm.getInputProps("deliveryDate")}
-            required
-          />
-          <Select
-            label="Select Site"
-            placeholder="Pick one"
-            searchable
-            nothingFound="No options"
-            data={sites}
-            {...addForm.getInputProps("site")}
-            required
-          />
-          <Select
-            placeholder="Status"
-            label="Enter Status"
-            data={[
-              { value: 'placed', label: 'Placed' },
-              { value: 'confirmed', label: 'Confirmed' },
-              { value: 'dispatched', label: 'Dispatched' },
-              { value: 'delivered', label: 'Delivered' },
-              { value: 'rejected', label: 'Rejected' },
-              ]} 
-            {...addForm.getInputProps("status")}
-            required
+          <Flex direction={"column"} gap={"sm"}>
+            <Flex justify={"space-between"}>
+              <Select
+                label="Select Site"
+                placeholder="Pick one"
+                searchable
+                nothingFound="No options"
+                data={sites}
+                {...addForm.getInputProps("site")}
+                w={"49%"}
+              />
+              <DatePicker
+                label="Expeted Delivery Date"
+                placeholder="Enter Delivery Date"
+                inputFormat="YYYY-MM-DD"
+                onChange={(value) => {
+                  if (!value) return;
+                  let newDate = new Date(value);
+                  newDate.setDate(newDate.getDate() + 1);
+                  addForm.setFieldValue(
+                    "deliveryDate",
+                    newDate.toISOString().slice(0, 10)
+                  );
+                }}
+                //exclude dates before the current day
+                excludeDate={(date) => date < new Date()}
+                required
+                w={"49%"}
+              />
+            </Flex>
+            <Select
+              label="Add product to the order"
+              description="Select a product to add to the order. products and quantities can not be changed after the order is approved."
+              placeholder="Pick one"
+              searchable
+              nothingFound="No options"
+              data={products}
+              onChange={(value) => {
+                if (!value) return;
+                const item = addFormPurchaceOrderItems.find(
+                  (item) => item.product === value
+                );
+                if (item) return;
+                const items = [
+                  ...addFormPurchaceOrderItems,
+                  {
+                    product: value,
+                    quantity: 1,
+                  },
+                ];
+                setAddFormPurchaceOrderItems(items);
+                addForm.setFieldValue("products", items);
+              }}
+            />
+            {addFormPurchaceOrderItems.map((item, index) => (
+              <Card key={index} pb={0} pt={0}>
+                <Flex justify={"space-between"} align={"center"}>
+                  <Select
+                    label={index === 0 ? "Product" : ""}
+                    data={products}
+                    defaultValue={item.product}
+                    required
+                    disabled
+                    w={"45%"}
+                  />
+                  <NumberInput
+                    label={index === 0 ? "Quantity" : ""}
+                    placeholder="Enter Quantity"
+                    defaultValue={item.quantity}
+                    min={1}
+                    max={100}
+                    required
+                    onChange={(value) => {
+                      if (!value) return;
+                      const items = [...addFormPurchaceOrderItems];
+                      items[index].quantity = value;
+                      setAddFormPurchaceOrderItems(items);
+                      addForm.setFieldValue("products", items);
+                    }}
+                    w={"45%"}
+                  />
+                  <ActionIcon
+                    variant="transparent"
+                    color="red"
+                    onClick={() => {
+                      const items = [...addFormPurchaceOrderItems];
+                      items.splice(index, 1);
+                      setAddFormPurchaceOrderItems(items);
+                      addForm.setFieldValue("products", items);
+                    }}
+                    mt={index === 0 ? 24 : 0}
+                  >
+                    <IconTrash size={32} />
+                  </ActionIcon>
+                </Flex>
+              </Card>
+            ))}
+            <Select
+              placeholder="Status"
+              label="Select Status"
+              description="When you crete a new order, it will be in placed status by default."
+              data={[
+                { value: "PLACED", label: "Placed" },
+                { value: "PENDING", label: "Pending" }, // Remove
+                { value: "APPROVED", label: "Approved" }, // Remove
+                { value: "DECLINED", label: "Declined" }, // Remove
+                { value: "DISPATCHED", label: "Dispatched" }, // Remove
+                { value: "DELIVERED", label: "Delivered" }, // Remove
+                { value: "CANCELLED", label: "Cancelled" }, // Remove
+              ]}
+              {...addForm.getInputProps("status")}
+              required
             />
 
-            <TextInput
-            placeholder="Special Notes"
-            label="Enter Special Notes"
-            {...addForm.getInputProps("specialNotes")}
-            required
+            <Textarea
+              label="Special Notes"
+              placeholder="Enter Special Notes"
+              description="Enter any special notes about the purchase order."
+              minRows={2}
+              maxRows={4}
+              {...addForm.getInputProps("specialNotes")}
+              required
             />
-          <Button
-            color="teal"
-            sx={{ marginTop: "10px", width: "100%" }}
-            type="submit"
-          >
-            Add
-          </Button>
+            <Button
+              color="teal"
+              sx={{ marginTop: "10px", width: "100%" }}
+              type="submit"
+            >
+              Create
+            </Button>
+          </Flex>
         </form>
       </Modal>
 
@@ -690,66 +785,133 @@ const ManageOrders: React.FC = () => {
           editForm.reset();
           setEditOpened(false);
         }}
-        title="Edit product record"
+        title="Edit Purchase Order"
+        size={"xl"}
+        zIndex={2000}
       >
         <form onSubmit={editForm.onSubmit((values) => editOrder(values))}>
-          <TextInput
-            label="ID"
-            placeholder="Enter ID"
-            disabled
-            {...editForm.getInputProps("id")}
-            required
-          />
+          <Flex justify={"space-between"}>
+            <Select
+              label="Select Site"
+              placeholder="Pick one"
+              searchable
+              nothingFound="No options"
+              data={sites}
+              {...editForm.getInputProps("site")}
+              w={"49%"}
+            />
+            <DatePicker
+              label="Expeted Delivery Date"
+              placeholder="Enter Delivery Date"
+              inputFormat="YYYY-MM-DD"
+              onChange={(value) => {
+                if (!value) return;
+                let newDate = new Date(value);
+                newDate.setDate(newDate.getDate() + 1);
+                editForm.setFieldValue(
+                  "deliveryDate",
+                  newDate.toISOString().slice(0, 10)
+                );
+              }}
+              //exclude dates before the current day
+              excludeDate={(date) => date < new Date()}
+              defaultValue={new Date(editForm.values.deliveryDate)}
+              required
+              w={"49%"}
+            />
+          </Flex>
           <Select
-            label="Select product"
+            label="Add product to the order"
+            description="Select a product to add to the order. products and quantities can not be changed after the order is approved."
             placeholder="Pick one"
             searchable
             nothingFound="No options"
             data={products}
-            {...editForm.getInputProps("product")}
-            required
+            onChange={(value) => {
+              if (!value) return;
+              const item = editFormPurchaceOrderItems.find(
+                (item) => item.product === value
+              );
+              if (item) return;
+              const items = [
+                ...editFormPurchaceOrderItems,
+                {
+                  product: value,
+                  quantity: 1,
+                },
+              ];
+              setEditFormPurchaceOrderItems(items);
+              editForm.setFieldValue("products", items);
+            }}
           />
-          <TextInput
-            label="Quantity"
-            placeholder="Enter Quantity"
-            {...editForm.getInputProps("quantity")}
-            required
-          />
-          <TextInput
-            label="Delivery Date"
-            placeholder="Enter Delivery Date"
-            {...editForm.getInputProps("deliveryDate")}
-            required
-          />
-          <Select
-            label="Select Site"
-            placeholder="Pick one"
-            searchable
-            nothingFound="No options"
-            data={sites}
-            {...editForm.getInputProps("site")}
-            required
-          />
+          {editFormPurchaceOrderItems.map((item, index) => (
+            <Card key={index} pb={0} pt={0}>
+              <Flex justify={"space-between"} align={"center"}>
+                <Select
+                  label={index === 0 ? "Product" : ""}
+                  data={products}
+                  defaultValue={item.product}
+                  required
+                  disabled
+                  w={"45%"}
+                />
+                <NumberInput
+                  label={index === 0 ? "Quantity" : ""}
+                  placeholder="Enter Quantity"
+                  defaultValue={item.quantity}
+                  min={1}
+                  max={100}
+                  required
+                  onChange={(value) => {
+                    if (!value) return;
+                    const items = [...editFormPurchaceOrderItems];
+                    items[index].quantity = value;
+                    setEditFormPurchaceOrderItems(items);
+                    editForm.setFieldValue("products", items);
+                  }}
+                  w={"45%"}
+                />
+                <ActionIcon
+                  variant="transparent"
+                  color="red"
+                  onClick={() => {
+                    const items = [...editFormPurchaceOrderItems];
+                    items.splice(index, 1);
+                    setEditFormPurchaceOrderItems(items);
+                    editForm.setFieldValue("products", items);
+                  }}
+                  mt={index === 0 ? 24 : 0}
+                >
+                  <IconTrash size={32} />
+                </ActionIcon>
+              </Flex>
+            </Card>
+          ))}
           <Select
             placeholder="Status"
-            label="Enter Status"
+            label="Select Status"
+            description="When you crete a new order, it will be in placed status by default."
             data={[
-                { value: 'placed', label: 'Placed' },
-                { value: 'confirmed', label: 'Confirmed' },
-                { value: 'dispatched', label: 'Dispatched' },
-                { value: 'delivered', label: 'Delivered' },
-                { value: 'rejected', label: 'Rejected' },
-              ]} 
+              { value: "PLACED", label: "Placed" },
+              { value: "PENDING", label: "Pending" }, // Remove
+              { value: "APPROVED", label: "Approved" }, // Remove
+              { value: "DECLINED", label: "Declined" }, // Remove
+              { value: "DISPATCHED", label: "Dispatched" }, // Remove
+              { value: "DELIVERED", label: "Delivered" }, // Remove
+              { value: "CANCELLED", label: "Cancelled" }, // Remove
+            ]}
             {...editForm.getInputProps("status")}
             required
-            />
-
-            <TextInput
-            placeholder="Special Notes"
-            label="Enter Special Notes"
+          />
+          <Textarea
+            label="Special Notes"
+            placeholder="Enter Special Notes"
+            description="Enter any special notes about the purchase order."
+            minRows={2}
+            maxRows={4}
             {...editForm.getInputProps("specialNotes")}
             required
-            />
+          />
           <Button
             color="teal"
             sx={{ marginTop: "10px", width: "100%" }}
@@ -775,7 +937,7 @@ const ManageOrders: React.FC = () => {
             sx={{ width: "200px", marginRight: "20px" }}
             onClick={() => setOpened(true)}
           >
-            Add Order record
+            Create Purchase Order
           </Button>
         </Box>
         <ScrollArea>
@@ -794,27 +956,6 @@ const ManageOrders: React.FC = () => {
                   ID
                 </Th>
                 <Th
-                  sorted={sortBy === "product"}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting("product")}
-                >
-                  Product
-                </Th>
-                <Th
-                  sorted={sortBy === "quantity"}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting("quantity")}
-                >
-                  Quantity
-                </Th>
-                <Th
-                  sorted={sortBy === "deliveryDate"}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting("deliveryDate")}
-                >
-                  Delivery Date
-                </Th>
-                <Th
                   sorted={sortBy === "site"}
                   reversed={reverseSortDirection}
                   onSort={() => setSorting("site")}
@@ -822,18 +963,25 @@ const ManageOrders: React.FC = () => {
                   Site
                 </Th>
                 <Th
+                  sorted={sortBy === "deliveryDate"}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting("deliveryDate")}
+                >
+                  Expected Delivery Date
+                </Th>
+                <Th
+                  sorted={sortBy === "products"}
+                  reversed={reverseSortDirection}
+                  onSort={() => setSorting("products")}
+                >
+                  Products
+                </Th>
+                <Th
                   sorted={sortBy === "status"}
                   reversed={reverseSortDirection}
                   onSort={() => setSorting("status")}
                 >
                   Status
-                </Th>
-                <Th
-                  sorted={sortBy === "specialNotes"}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting("specialNotes")}
-                >
-                  Special Notes
                 </Th>
                 <Th
                   sorted={sortBy === "updatedBy"}

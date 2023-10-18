@@ -5,7 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider } from "@mantine/core";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

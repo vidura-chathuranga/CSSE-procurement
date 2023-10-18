@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   createStyles,
   Container,
@@ -8,55 +8,63 @@ import {
   Text,
   Menu,
   Burger,
-} from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+  Title,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import {
   IconLogout,
   IconBellRinging,
   IconSettings,
   IconTrash,
   IconChevronDown,
-} from '@tabler/icons';
+} from "@tabler/icons";
 import Profile from "../../assets/defaultprofile.png";
 
 // Header styles
 const useStyles = createStyles((theme) => ({
   header: {
     paddingTop: theme.spacing.sm,
-    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+    backgroundColor:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[6]
+        : theme.colors.gray[0],
     borderBottom: `1px solid ${
-      theme.colorScheme === 'dark' ? 'transparent' : theme.colors.gray[2]
+      theme.colorScheme === "dark" ? "transparent" : theme.colors.gray[2]
     }`,
     marginBottom: 5,
+    width: "100%",
   },
 
   mainSection: {
     paddingBottom: theme.spacing.sm,
+    width: "100%",
   },
 
   user: {
-    color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+    color: theme.colorScheme === "dark" ? theme.colors.dark[0] : theme.black,
     padding: `${theme.spacing.xs}px ${theme.spacing.sm}px`,
     borderRadius: theme.radius.sm,
-    transition: 'background-color 100ms ease',
+    transition: "background-color 100ms ease",
 
-    '&:hover': {
-      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.white,
+    "&:hover": {
+      backgroundColor:
+        theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
     },
 
-    [theme.fn.smallerThan('xs')]: {
-      display: 'none',
+    [theme.fn.smallerThan("xs")]: {
+      display: "none",
     },
   },
 
   burger: {
-    [theme.fn.largerThan('xs')]: {
-      display: 'none',
+    [theme.fn.largerThan("xs")]: {
+      display: "none",
     },
   },
 
   userActive: {
-    backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.white,
+    backgroundColor:
+      theme.colorScheme === "dark" ? theme.colors.dark[8] : theme.white,
   },
 }));
 
@@ -69,16 +77,21 @@ const ManagerHeader = ({ componentName }: HeaderTabsProps) => {
   const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem('manager') || '{}');
+  const user = JSON.parse(localStorage.getItem("manager") || "{}");
 
   return (
     <div className={classes.header}>
       <Container className={classes.mainSection}>
         <Group position="apart">
-            <Text size="xl" weight={700}>
-                {componentName}
-            </Text>
-          <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
+          <Title order={3} weight={700}>
+            {componentName}
+          </Title>
+          <Burger
+            opened={opened}
+            onClick={toggle}
+            className={classes.burger}
+            size="sm"
+          />
 
           {/* User Profile Drop down menu */}
           <Menu
@@ -90,7 +103,9 @@ const ManagerHeader = ({ componentName }: HeaderTabsProps) => {
           >
             <Menu.Target>
               <UnstyledButton
-                className={cx(classes.user, { [classes.userActive]: userMenuOpened })}
+                className={cx(classes.user, {
+                  [classes.userActive]: userMenuOpened,
+                })}
               >
                 <Group spacing={7}>
                   <Avatar src={Profile} alt={user.name} radius="xl" size={20} />
@@ -102,19 +117,44 @@ const ManagerHeader = ({ componentName }: HeaderTabsProps) => {
               </UnstyledButton>
             </Menu.Target>
             <Menu.Dropdown>
-              <Menu.Item icon={<IconBellRinging size={14} color={theme.colors.blue[6]} stroke={1.5} />}>
+              <Menu.Item
+                icon={
+                  <IconBellRinging
+                    size={14}
+                    color={theme.colors.blue[6]}
+                    stroke={1.5}
+                  />
+                }
+              >
                 Notifications
               </Menu.Item>
 
               <Menu.Label>Settings</Menu.Label>
-              <Menu.Item icon={<IconSettings size={14} stroke={1.5} />}>Account settings</Menu.Item>
-              <Menu.Item icon={<IconLogout size={14} stroke={1.5} />}><a href="/logout" style={{color: "inherit", textDecoration: "inherit"}}>Logout</a></Menu.Item>
+              <Menu.Item icon={<IconSettings size={14} stroke={1.5} />}>
+                Account settings
+              </Menu.Item>
+              <Menu.Item icon={<IconLogout size={14} stroke={1.5} />}>
+                <a
+                  href="/logout"
+                  style={{ color: "inherit", textDecoration: "inherit" }}
+                >
+                  Logout
+                </a>
+              </Menu.Item>
 
               <Menu.Divider />
 
               <Menu.Label>Danger zone</Menu.Label>
-              <Menu.Item color="red" icon={<IconTrash size={14} stroke={1.5} />}>
-                  <a href="/logout" style={{color: "inherit", textDecoration: "inherit"}}>Delete Account</a>
+              <Menu.Item
+                color="red"
+                icon={<IconTrash size={14} stroke={1.5} />}
+              >
+                <a
+                  href="/logout"
+                  style={{ color: "inherit", textDecoration: "inherit" }}
+                >
+                  Delete Account
+                </a>
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
@@ -122,6 +162,6 @@ const ManagerHeader = ({ componentName }: HeaderTabsProps) => {
       </Container>
     </div>
   );
-}
+};
 
 export default ManagerHeader;
