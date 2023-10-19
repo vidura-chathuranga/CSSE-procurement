@@ -18,6 +18,7 @@ import {
   Card,
   NumberInput,
   ActionIcon,
+  Tooltip,
 } from "@mantine/core";
 import { keys } from "@mantine/utils";
 import {
@@ -25,6 +26,7 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconSearch,
+  IconX,
 } from "@tabler/icons";
 import { IconEdit, IconTrash } from "@tabler/icons";
 import { openConfirmModal } from "@mantine/modals";
@@ -218,6 +220,15 @@ const ManageOrders: React.FC = () => {
     PurchaceOrderItems[]
   >([]);
 
+  const [search, setSearch] = useState("");
+  const [sortedData, setSortedData] = useState(data);
+  const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
+  const [reverseSortDirection, setReverseSortDirection] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const [editOpened, setEditOpened] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem("manager") || "{}");
+
   // fetch order data
   useEffect(() => {
     // define fetchData function
@@ -294,13 +305,6 @@ const ManageOrders: React.FC = () => {
     // call to fetchData function declared above, Then it will fetch all the data of the orders,managers,prodcuts and sites
     fetchData();
   }, []);
-
-  const [search, setSearch] = useState("");
-  const [sortedData, setSortedData] = useState(data);
-  const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
-  const [reverseSortDirection, setReverseSortDirection] = useState(false);
-  const [opened, setOpened] = useState(false);
-  const [editOpened, setEditOpened] = useState(false);
 
   //edit order form
   const editOrder = async (values: {
@@ -546,8 +550,8 @@ const ManageOrders: React.FC = () => {
       centered: true,
       children: (
         <Text size="sm">
-          Are you sure you want to delete this order record? This action cannot
-          be undone.
+          Are you sure you want to delete this purchase order? This action
+          cannot be undone.
         </Text>
       ),
       labels: { confirm: "Delete order record", cancel: "No don't delete it" },
@@ -563,6 +567,144 @@ const ManageOrders: React.FC = () => {
         deleteOrder(id);
       },
     });
+
+  //Open approve modal
+  const openApproveModal = (order: RowData) =>
+    openConfirmModal({
+      title: "Approve this Order record?",
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to approve this purchase order?
+        </Text>
+      ),
+      labels: {
+        confirm: "Approve order record",
+        cancel: "No don't approve it",
+      },
+      confirmProps: { color: "yellow" },
+      onCancel: () => {
+        showNotification({
+          title: "Cancelled",
+          message: "The order record was not approved",
+          color: "teal",
+        });
+      },
+      onConfirm: () => {
+        approveOrder(order);
+      },
+    });
+
+  //open decline modal
+  const openDeclineModal = (order: RowData) =>
+    openConfirmModal({
+      title: "Decline this Order record?",
+      centered: true,
+      children: (
+        <Text size="sm">
+          Are you sure you want to decline this purchase order?
+        </Text>
+      ),
+      labels: {
+        confirm: "Decline order record",
+        cancel: "No don't decline it",
+      },
+      confirmProps: { color: "red" },
+      onCancel: () => {
+        showNotification({
+          title: "Cancelled",
+          message: "The order record was not declined",
+          color: "teal",
+        });
+      },
+      onConfirm: () => {
+        declineOrder(order);
+      },
+    });
+
+  //Approve order
+  const approveOrder = async (order: RowData) => {
+    showNotification({
+      id: "approve-order",
+      loading: true,
+      title: "Approving order",
+      message: "Please wait while we approve the order record",
+      autoClose: false,
+      disallowClose: true,
+    });
+    order.status = "APPROVED";
+    ManagerAPI.editOrder(order)
+      .then((response) => {
+        updateNotification({
+          id: "approve-order",
+          color: "teal",
+          title: "order record approved successfully",
+          message: "The order record has been approved successfully",
+          icon: <IconCheck size={16} />,
+          autoClose: 5000,
+        });
+        const newData = data.filter((item) => item.id !== order.id);
+        const payload = {
+          sortBy: null,
+          reversed: false,
+          search: "",
+        };
+        setData(newData);
+        setSortedData(sortData(newData, payload));
+      })
+      .catch((error) => {
+        updateNotification({
+          id: "approve-order",
+          color: "red",
+          title: "Approving order record failed",
+          message: "We were unable to approve the order record",
+          icon: <IconAlertTriangle size={16} />,
+          autoClose: 5000,
+        });
+      });
+  };
+
+  //Decline order
+  const declineOrder = async (order: RowData) => {
+    showNotification({
+      id: "decline-order",
+      loading: true,
+      title: "Declining order",
+      message: "Please wait while we decline the order record",
+      autoClose: false,
+      disallowClose: true,
+    });
+    order.status = "DECLINED";
+    ManagerAPI.editOrder(order)
+      .then((response) => {
+        updateNotification({
+          id: "decline-order",
+          color: "teal",
+          title: "order record declined successfully",
+          message: "The order record has been declined successfully",
+          icon: <IconCheck size={16} />,
+          autoClose: 5000,
+        });
+        const newData = data.filter((item) => item.id !== order.id);
+        const payload = {
+          sortBy: null,
+          reversed: false,
+          search: "",
+        };
+        setData(newData);
+        setSortedData(sortData(newData, payload));
+      })
+      .catch((error) => {
+        updateNotification({
+          id: "decline-order",
+          color: "red",
+          title: "Declining order record failed",
+          message: "We were unable to decline the order record",
+          icon: <IconAlertTriangle size={16} />,
+          autoClose: 5000,
+        });
+      });
+  };
 
   //create rows
   const rows = sortedData.map((row) => (
@@ -595,37 +737,62 @@ const ManageOrders: React.FC = () => {
       </td>
       <td>{managers.find((manager) => manager.id === row.updatedBy)?.name}</td>
       <td>
-        {/* Order edit button */}
-        <Button
-          color="teal"
-          leftIcon={<IconEdit size={14} />}
-          onClick={() => {
-            setEditFormPurchaceOrderItems(row.products ? row.products : []);
-            editForm.setValues({
-              id: row.id,
-              products: editFormPurchaceOrderItems,
-              deliveryDate: row.deliveryDate.slice(0, 10),
-              site: row.site,
-              status: row.status,
-              specialNotes: row.specialNotes,
-              updatedBy: row.updatedBy,
-            });
-            setEditOpened(true);
-          }}
-          sx={{ margin: "5px", width: "100px" }}
-        >
-          Edit
-        </Button>
+        <Flex align={"center"} gap={5}>
+          <Tooltip label="Edit Station">
+            <ActionIcon
+              onClick={() => {
+                setEditFormPurchaceOrderItems(row.products ? row.products : []);
+                editForm.setValues({
+                  id: row.id,
+                  products: editFormPurchaceOrderItems,
+                  deliveryDate: row.deliveryDate.slice(0, 10),
+                  site: row.site,
+                  status: row.status,
+                  specialNotes: row.specialNotes,
+                  updatedBy: row.updatedBy,
+                });
+                setEditOpened(true);
+              }}
+            >
+              <IconEdit color="teal" size="24px" stroke={1.5} />
+            </ActionIcon>
+          </Tooltip>
 
-        {/* order delete button */}
-        <Button
-          color="red"
-          leftIcon={<IconTrash size={14} />}
-          onClick={() => openDeleteModal(row.id)}
-          sx={{ margin: "5px", width: "100px" }}
-        >
-          Delete
-        </Button>
+          {user.role === "MANAGER" && (
+            <>
+              <Tooltip label="Approve Order">
+                <ActionIcon
+                  onClick={() => {
+                    openApproveModal(row);
+                  }}
+                >
+                  <IconCheck color="orange" size="24px" stroke={1.5} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Decline Order">
+                <ActionIcon
+                  onClick={() => {
+                    openDeclineModal(row);
+                  }}
+                >
+                  <IconX color="red" size="24px" stroke={1.5} />
+                </ActionIcon>
+              </Tooltip>
+            </>
+          )}
+          <Tooltip
+            label="Delete Order"
+            disabled={"PLACED,PENDING".includes(row.status) ? false : true}
+          >
+            <ActionIcon
+              onClick={() => {
+                openDeleteModal(row.id);
+              }}
+            >
+              <IconTrash color="red" size="24px" stroke={1.5} />
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
       </td>
     </tr>
   ));
@@ -799,6 +966,9 @@ const ManageOrders: React.FC = () => {
               data={sites}
               {...editForm.getInputProps("site")}
               w={"49%"}
+              disabled={
+                "PLACED,PENDING".includes(editForm.values.status) ? false : true
+              }
             />
             <DatePicker
               label="Expeted Delivery Date"
@@ -818,6 +988,9 @@ const ManageOrders: React.FC = () => {
               defaultValue={new Date(editForm.values.deliveryDate)}
               required
               w={"49%"}
+              disabled={
+                "PLACED,PENDING".includes(editForm.values.status) ? false : true
+              }
             />
           </Flex>
           <Select
@@ -843,6 +1016,9 @@ const ManageOrders: React.FC = () => {
               setEditFormPurchaceOrderItems(items);
               editForm.setFieldValue("products", items);
             }}
+            disabled={
+              "PLACED,PENDING".includes(editForm.values.status) ? false : true
+            }
           />
           {editFormPurchaceOrderItems.map((item, index) => (
             <Card key={index} pb={0} pt={0}>
@@ -870,6 +1046,11 @@ const ManageOrders: React.FC = () => {
                     editForm.setFieldValue("products", items);
                   }}
                   w={"45%"}
+                  disabled={
+                    "PLACED,PENDING".includes(editForm.values.status)
+                      ? false
+                      : true
+                  }
                 />
                 <ActionIcon
                   variant="transparent"
@@ -911,6 +1092,9 @@ const ManageOrders: React.FC = () => {
             maxRows={4}
             {...editForm.getInputProps("specialNotes")}
             required
+            disabled={
+              "PLACED,PENDING".includes(editForm.values.status) ? false : true
+            }
           />
           <Button
             color="teal"
@@ -974,7 +1158,7 @@ const ManageOrders: React.FC = () => {
                   reversed={reverseSortDirection}
                   onSort={() => setSorting("products")}
                 >
-                  Products
+                  Items
                 </Th>
                 <Th
                   sorted={sortBy === "status"}
