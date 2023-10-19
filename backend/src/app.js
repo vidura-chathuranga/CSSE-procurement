@@ -32,5 +32,7 @@ app.get("/", (req, res, next) => {
 app.listen(PORT, () => {
   logger.info(`Server started on port ${PORT}`);
   connect();
-	routes(app);
+  routes(app);
 });
+
+export default app;
