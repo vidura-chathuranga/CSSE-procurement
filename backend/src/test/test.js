@@ -148,7 +148,6 @@ describe("Orders", () => {
   describe("GET /order/:id", () => {
     it("should get an order by ID", (done) => {
       const orderId = order._id;
-      console.log(orderId);
       chai
         .request(app)
         .get(`/order/${orderId}`)
