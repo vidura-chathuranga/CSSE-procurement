@@ -8,7 +8,6 @@ import {
   Paper,
   Text,
   SimpleGrid,
-  Badge,
 } from "@mantine/core";
 import {
   IconArchive,

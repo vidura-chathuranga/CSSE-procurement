@@ -62,6 +62,9 @@ import app from "../app";
 chai.use(chaiHttp);
 const { expect } = chai;
 
+const token =
+  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTJmZDY3Mzk0YmZkZjNjMWY0ODY4ZWUiLCJyb2xlIjoiTUFOQUdFUiIsImlhdCI6MTY5NzgyMjA0NSwiZXhwIjoxNjk3OTA4NDQ1fQ.h7u6N-TKpaUyiyFFHPdETtje6_neC9lSmzD0KJeDs6A";
+
 describe("Orders", () => {
   //GET all orders
   describe("GET /order", () => {
@@ -69,10 +72,7 @@ describe("Orders", () => {
       chai
         .request(app)
         .get("/order")
-        .set(
-          "Authorization",
-          `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTJmZDY3Mzk0YmZkZjNjMWY0ODY4ZWUiLCJyb2xlIjoiTUFOQUdFUiIsImlhdCI6MTY5NzY4NzI2OSwiZXhwIjoxNjk3NzczNjY5fQ.pwUwRB-eKk8wQORzYIz9xFkohBgRfDk3jue67CJJrzg`
-        )
+        .set("Authorization", token)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("array");
@@ -102,10 +102,7 @@ describe("Orders", () => {
         .request(app)
         .post("/order")
         .send(orderObj)
-        .set(
-          "Authorization",
-          `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTJmZDY3Mzk0YmZkZjNjMWY0ODY4ZWUiLCJyb2xlIjoiTUFOQUdFUiIsImlhdCI6MTY5NzY4NzI2OSwiZXhwIjoxNjk3NzczNjY5fQ.pwUwRB-eKk8wQORzYIz9xFkohBgRfDk3jue67CJJrzg`
-        )
+        .set("Authorization", token)
         .end((err, res) => {
           expect(res).to.have.status(201);
           expect(res.body).to.be.an("object");
@@ -151,10 +148,7 @@ describe("Orders", () => {
       chai
         .request(app)
         .get(`/order/${orderId}`)
-        .set(
-          "Authorization",
-          `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTJmZDY3Mzk0YmZkZjNjMWY0ODY4ZWUiLCJyb2xlIjoiTUFOQUdFUiIsImlhdCI6MTY5NzY4NzI2OSwiZXhwIjoxNjk3NzczNjY5fQ.pwUwRB-eKk8wQORzYIz9xFkohBgRfDk3jue67CJJrzg`
-        )
+        .set("Authorization", token)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an("object");
@@ -200,10 +194,7 @@ describe("Orders", () => {
         .request(app)
         .put(`/order/${orderId}`)
         .send(orderObj)
-        .set(
-          "Authorization",
-          `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTJmZDY3Mzk0YmZkZjNjMWY0ODY4ZWUiLCJyb2xlIjoiTUFOQUdFUiIsImlhdCI6MTY5NzY4NzI2OSwiZXhwIjoxNjk3NzczNjY5fQ.pwUwRB-eKk8wQORzYIz9xFkohBgRfDk3jue67CJJrzg`
-        )
+        .set("Authorization", token)
         .end((err, res) => {
           expect(res).to.have.status(201);
           expect(res.body).to.be.an("object");
@@ -250,10 +241,7 @@ describe("Orders", () => {
       chai
         .request(app)
         .delete(`/order/${orderId}`)
-        .set(
-          "Authorization",
-          `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTJmZDY3Mzk0YmZkZjNjMWY0ODY4ZWUiLCJyb2xlIjoiTUFOQUdFUiIsImlhdCI6MTY5NzY4NzI2OSwiZXhwIjoxNjk3NzczNjY5fQ.pwUwRB-eKk8wQORzYIz9xFkohBgRfDk3jue67CJJrzg`
-        )
+        .set("Authorization", token)
         .end((err, res) => {
           expect(res).to.have.status(200);
           done();
