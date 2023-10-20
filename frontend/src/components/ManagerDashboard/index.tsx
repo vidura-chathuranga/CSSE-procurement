@@ -325,18 +325,7 @@ const ManagerDashboard: React.FC = () => {
           <Group className={classes.header} position="apart">
             <img src={Logo} alt="Logo" width="150" height="75" />
             <Code sx={{ fontWeight: 700 }}>v1.0.0</Code>
-            <Box ta={"center"} mb={10}>
-              {user.role === "MANAGER" ? (
-                <Badge color="blue">Manager</Badge>
-              ) : user.role === "SITE_MANAGER" ? (
-                <Badge color="red">Site Manager</Badge>
-              ) : (
-                <Badge color="orange">Procurement Staff</Badge>
-              )}
-            </Box>
           </Group>
-          {/* role */}
-
           {links}
         </Navbar.Section>
 
