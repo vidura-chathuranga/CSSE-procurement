@@ -2,62 +2,6 @@ import chai from "chai";
 import chaiHttp from "chai-http";
 import app from "../app";
 
-// import { model, Schema } from "mongoose";
-
-// const OrderSchema = new Schema(
-//   {
-//     id: {
-//       type: Schema.Types.ObjectId,
-//     },
-//     products: [
-//       {
-//         product: {
-//           type: Schema.Types.ObjectId,
-//           ref: "Product",
-//         },
-//         quantity: {
-//           type: Number,
-//           required: true,
-//         },
-//       },
-//     ],
-//     deliveryDate: {
-//       type: Date,
-//       required: true,
-//     },
-//     site: {
-//       type: Schema.Types.ObjectId,
-//       ref: "Site",
-//     },
-//     status: {
-//       type: String,
-//       required: true,
-//     },
-//     specialNotes: {
-//       type: String,
-//       required: true,
-//     },
-//     updatedBy: {
-//       type: Schema.Types.ObjectId,
-//       ref: "Manager",
-//     },
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
-
-// export default model("Order", OrderSchema);
-
-// Order routes
-// app.post("/order", protect.managerProtect, orderController.insertOrder);
-// app.get("/order", protect.managerProtect, orderController.getAllOrders);
-// app.get("/order/:id", protect.managerProtect, orderController.getOrderById);
-// app.put("/order/:id", protect.managerProtect, orderController.updateOrderById);
-// app.delete("/order/:id", protect.managerProtect, orderController.deleteOrderById);
-// login
-// app.post( "/manager/login", managerController.loginManager );
-
 // Configure chai
 chai.use(chaiHttp);
 const { expect } = chai;
