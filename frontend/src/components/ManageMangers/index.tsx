@@ -13,6 +13,7 @@ import {
   Modal,
   Select,
   PasswordInput,
+  Badge,
 } from "@mantine/core";
 import { keys } from "@mantine/utils";
 import {
@@ -140,7 +141,6 @@ const ManageMangers: React.FC = () => {
   // fetch manager data
   useEffect(() => {
     const fetchData = async () => {
-
       // show loading notification
       showNotification({
         id: "loding-data",
@@ -171,7 +171,7 @@ const ManageMangers: React.FC = () => {
         search: "",
       };
       setSortedData(sortData(data, payload));
-      
+
       // update the loading notificaiton to success
       updateNotification({
         id: "loding-data",
@@ -188,7 +188,7 @@ const ManageMangers: React.FC = () => {
 
   const [search, setSearch] = useState(""); //store search query
   const [sortedData, setSortedData] = useState(data); //store sorted data
-  const [sortBy, setSortBy] = useState<keyof RowData | null>(null); 
+  const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
   const [opened, setOpened] = useState(false); //manage add modal open state
   const [editOpened, setEditOpened] = useState(false); //manage open edit modal state
@@ -433,11 +433,14 @@ const ManageMangers: React.FC = () => {
       centered: true,
       children: (
         <Text size="sm">
-          Are you sure you want to delete this manager record? This action cannot
-          be undone.
+          Are you sure you want to delete this manager record? This action
+          cannot be undone.
         </Text>
       ),
-      labels: { confirm: "Delete manager record", cancel: "No don't delete it" },
+      labels: {
+        confirm: "Delete manager record",
+        cancel: "No don't delete it",
+      },
       confirmProps: { color: "red" },
       onCancel: () => {
         showNotification({
@@ -454,12 +457,18 @@ const ManageMangers: React.FC = () => {
   //create rows
   const rows = sortedData.map((row) => (
     <tr key={row.id}>
-      <td>{row.id}</td>
+      <td>{row.id.slice(0, 7)}</td>
       <td>{row.name}</td>
       <td>{row.email}</td>
       <td>{row.phone}</td>
       <td>
-        {row.role === "MANAGER" ? "Manager" : "Site Manager"}
+        {row.role === "MANAGER" ? (
+          <Badge color="blue">Manager</Badge>
+        ) : row.role === "SITE_MANAGER" ? (
+          <Badge color="red">Site Manager</Badge>
+        ) : (
+          <Badge color="orange">Procurement Staff</Badge>
+        )}
       </td>
       <td>
         {/* manager edit button */}
@@ -496,7 +505,6 @@ const ManageMangers: React.FC = () => {
 
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-
       {/* Manager add form modal */}
       <Modal
         opened={opened}
@@ -504,7 +512,7 @@ const ManageMangers: React.FC = () => {
           addForm.reset();
           setOpened(false);
         }}
-        title="Add manager Record"
+        title="Add User"
       >
         <form onSubmit={addForm.onSubmit((values) => addManager(values))}>
           <TextInput
@@ -537,9 +545,10 @@ const ManageMangers: React.FC = () => {
             searchable
             nothingFound="No options"
             data={[
-                { label: "Manager", value: "MANAGER" },
-                { label: "Site Manager", value: "SITE_MANAGER" },
-              ]}
+              { label: "Manager", value: "MANAGER" },
+              { label: "Site Manager", value: "SITE_MANAGER" },
+              { label: "Procurement Staff", value: "PROCUREMENT_STAFF" },
+            ]}
             {...addForm.getInputProps("role")}
             required
           />
@@ -560,16 +569,9 @@ const ManageMangers: React.FC = () => {
           editForm.reset();
           setEditOpened(false);
         }}
-        title="Edit manager Record"
+        title="Edit User"
       >
         <form onSubmit={editForm.onSubmit((values) => editManagers(values))}>
-          <TextInput
-            label="ID"
-            placeholder="Enter ID"
-            disabled
-            {...editForm.getInputProps("id")}
-            required
-          />
           <TextInput
             label="Name"
             placeholder="Enter name"
@@ -594,6 +596,7 @@ const ManageMangers: React.FC = () => {
             data={[
               { label: "Manager", value: "MANAGER" },
               { label: "Site Manager", value: "SITE_MANAGER" },
+              { label: "Procurement Staff", value: "PROCUREMENT_STAFF" },
             ]}
             {...addForm.getInputProps("role")}
             value={editForm.values.role}
@@ -624,7 +627,7 @@ const ManageMangers: React.FC = () => {
             sx={{ width: "200px", marginRight: "20px" }}
             onClick={() => setOpened(true)}
           >
-            Add manager Record
+            Add User
           </Button>
         </Box>
 

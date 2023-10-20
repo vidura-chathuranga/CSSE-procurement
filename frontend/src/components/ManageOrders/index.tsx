@@ -566,6 +566,7 @@ const ManageOrders: React.FC = () => {
       onConfirm: () => {
         deleteOrder(id);
       },
+      zIndex: 2000,
     });
 
   //Open approve modal
@@ -593,6 +594,7 @@ const ManageOrders: React.FC = () => {
       onConfirm: () => {
         approveOrder(order);
       },
+      zIndex: 2000,
     });
 
   //open decline modal
@@ -620,6 +622,7 @@ const ManageOrders: React.FC = () => {
       onConfirm: () => {
         declineOrder(order);
       },
+      zIndex: 2000,
     });
 
   //Approve order
@@ -912,15 +915,7 @@ const ManageOrders: React.FC = () => {
               placeholder="Status"
               label="Select Status"
               description="When you crete a new order, it will be in placed status by default."
-              data={[
-                { value: "PLACED", label: "Placed" },
-                { value: "PENDING", label: "Pending" }, // Remove
-                { value: "APPROVED", label: "Approved" }, // Remove
-                { value: "DECLINED", label: "Declined" }, // Remove
-                { value: "DISPATCHED", label: "Dispatched" }, // Remove
-                { value: "DELIVERED", label: "Delivered" }, // Remove
-                { value: "CANCELLED", label: "Cancelled" }, // Remove
-              ]}
+              data={[{ value: "PLACED", label: "Placed" }]}
               {...addForm.getInputProps("status")}
               required
             />
@@ -1074,12 +1069,36 @@ const ManageOrders: React.FC = () => {
             description="When you crete a new order, it will be in placed status by default."
             data={[
               { value: "PLACED", label: "Placed" },
-              { value: "PENDING", label: "Pending" }, // Remove
-              { value: "APPROVED", label: "Approved" }, // Remove
-              { value: "DECLINED", label: "Declined" }, // Remove
-              { value: "DISPATCHED", label: "Dispatched" }, // Remove
-              { value: "DELIVERED", label: "Delivered" }, // Remove
-              { value: "CANCELLED", label: "Cancelled" }, // Remove
+              {
+                value: "PENDING",
+                label: "Pending",
+                disabled: user.role === "SITE_MANAGER",
+              },
+              {
+                value: "APPROVED",
+                label: "Approved",
+                disabled: user.role === "SITE_MANAGER",
+              },
+              {
+                value: "DECLINED",
+                label: "Declined",
+                disabled: user.role === "SITE_MANAGER",
+              },
+              {
+                value: "DISPATCHED",
+                label: "Dispatched",
+                disabled: user.role === "SITE_MANAGER",
+              },
+              {
+                value: "DELIVERED",
+                label: "Delivered",
+                disabled: user.role === "SITE_MANAGER",
+              },
+              {
+                value: "CANCELLED",
+                label: "Cancelled",
+                disabled: user.role === "SITE_MANAGER",
+              },
             ]}
             {...editForm.getInputProps("status")}
             required

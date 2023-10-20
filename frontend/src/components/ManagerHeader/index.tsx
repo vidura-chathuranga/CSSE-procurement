@@ -9,6 +9,8 @@ import {
   Menu,
   Burger,
   Title,
+  Badge,
+  Box,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -114,6 +116,15 @@ const ManagerHeader = ({ componentName }: HeaderTabsProps) => {
                   </Text>
                   <IconChevronDown size={12} stroke={1.5} />
                 </Group>
+                <Box ta={"center"}>
+                  {user.role === "MANAGER" ? (
+                    <Badge color="blue">Manager</Badge>
+                  ) : user.role === "SITE_MANAGER" ? (
+                    <Badge color="red">Site Manager</Badge>
+                  ) : (
+                    <Badge color="orange">Procurement Staff</Badge>
+                  )}
+                </Box>
               </UnstyledButton>
             </Menu.Target>
             <Menu.Dropdown>

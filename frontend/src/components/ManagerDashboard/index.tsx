@@ -8,6 +8,7 @@ import {
   Paper,
   Text,
   SimpleGrid,
+  Badge,
 } from "@mantine/core";
 import {
   IconArchive,
@@ -120,7 +121,7 @@ const data = [
   { link: "", label: "Sites", icon: IconArchive },
   { link: "", label: "Products", icon: IconBuildingSkyscraper },
   { link: "", label: "Suppliers", icon: IconAddressBook },
-  { link: "", label: "Site Managers", icon: IconUserCircle },
+  { link: "", label: "Users", icon: IconUserCircle },
 ];
 
 export const ManagerDashboardComponent: React.FC = () => {
@@ -216,24 +217,31 @@ const ManagerDashboard: React.FC = () => {
       </Box>
     </Box>
   );
+  const user = JSON.parse(localStorage.getItem("manager") || "{}");
 
-  const links = data.map((item) => (
-    <a
-      className={cx(classes.link, {
-        [classes.linkActive]: item.label === active,
-      })}
-      href={item.link}
-      key={item.label}
-      onClick={(event) => {
-        event.preventDefault();
-        setActive(item.label);
-        changeComponent(item.label);
-      }}
-    >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
-      <span>{item.label}</span>
-    </a>
-  ));
+  const links = data.map((item) =>
+    item.label === "Users" && user.role !== "MANAGER" ? null : item.label ===
+        "Sites" && user.role === "SITE_MANAGER" ? null : item.label ===
+        "Products" && user.role === "SITE_MANAGER" ? null : item.label ===
+        "Suppliers" && user.role === "SITE_MANAGER" ? null : item.label ===
+        "Users" && user.role === "SITE_MANAGER" ? null : (
+      <a
+        className={cx(classes.link, {
+          [classes.linkActive]: item.label === active,
+        })}
+        href={item.link}
+        key={item.label}
+        onClick={(event) => {
+          event.preventDefault();
+          setActive(item.label);
+          changeComponent(item.label);
+        }}
+      >
+        <item.icon className={classes.linkIcon} stroke={1.5} />
+        <span>{item.label}</span>
+      </a>
+    )
+  );
 
   const changeComponent = (componentName: string) => {
     if (componentName === "Dashboard") {
@@ -254,7 +262,7 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === "Sites") {
+    } else if (componentName === "Sites" && user.role !== "SITE_MANAGER") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Sites" />
@@ -263,7 +271,7 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === "Products") {
+    } else if (componentName === "Products" && user.role !== "SITE_MANAGER") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Products" />
@@ -272,7 +280,7 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === "Suppliers") {
+    } else if (componentName === "Suppliers" && user.role !== "SITE_MANAGER") {
       setComponent(
         <Box>
           <ManagerHeader componentName="Suppliers" />
@@ -281,10 +289,10 @@ const ManagerDashboard: React.FC = () => {
           </Box>
         </Box>
       );
-    } else if (componentName === "Site Managers") {
+    } else if (componentName === "Users" && user.role === "MANAGER") {
       setComponent(
         <Box>
-          <ManagerHeader componentName="Site Managers" />
+          <ManagerHeader componentName="Users" />
           <Box>
             <ManageMangers />
           </Box>
@@ -317,7 +325,18 @@ const ManagerDashboard: React.FC = () => {
           <Group className={classes.header} position="apart">
             <img src={Logo} alt="Logo" width="150" height="75" />
             <Code sx={{ fontWeight: 700 }}>v1.0.0</Code>
+            <Box ta={"center"} mb={10}>
+              {user.role === "MANAGER" ? (
+                <Badge color="blue">Manager</Badge>
+              ) : user.role === "SITE_MANAGER" ? (
+                <Badge color="red">Site Manager</Badge>
+              ) : (
+                <Badge color="orange">Procurement Staff</Badge>
+              )}
+            </Box>
           </Group>
+          {/* role */}
+
           {links}
         </Navbar.Section>
 
