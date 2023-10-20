@@ -580,7 +580,7 @@ const ManageOrders: React.FC = () => {
         </Text>
       ),
       labels: {
-        confirm: "Approve order record",
+        confirm: "Approve purchase order",
         cancel: "No don't approve it",
       },
       confirmProps: { color: "yellow" },
@@ -608,7 +608,7 @@ const ManageOrders: React.FC = () => {
         </Text>
       ),
       labels: {
-        confirm: "Decline order record",
+        confirm: "Decline purchase order",
         cancel: "No don't decline it",
       },
       confirmProps: { color: "red" },
@@ -646,7 +646,9 @@ const ManageOrders: React.FC = () => {
           icon: <IconCheck size={16} />,
           autoClose: 5000,
         });
-        const newData = data.filter((item) => item.id !== order.id);
+        const index = data.findIndex((item) => item.id === order.id);
+        const newData = [...data];
+        newData[index].status = "APPROVED";
         const payload = {
           sortBy: null,
           reversed: false,
@@ -683,12 +685,14 @@ const ManageOrders: React.FC = () => {
         updateNotification({
           id: "decline-order",
           color: "teal",
-          title: "order record declined successfully",
+          title: "Order record declined successfully",
           message: "The order record has been declined successfully",
           icon: <IconCheck size={16} />,
           autoClose: 5000,
         });
-        const newData = data.filter((item) => item.id !== order.id);
+        const index = data.findIndex((item) => item.id === order.id);
+        const newData = [...data];
+        newData[index].status = "DECLINED";
         const payload = {
           sortBy: null,
           reversed: false,
@@ -761,7 +765,8 @@ const ManageOrders: React.FC = () => {
             </ActionIcon>
           </Tooltip>
 
-          {user.role === "MANAGER" && (
+          {(user.role === "MANAGER" || user.role === "PROCUREMENT_STAFF") &&
+          "PLACED,PENDING".includes(row.status) && (
             <>
               <Tooltip label="Approve Order">
                 <ActionIcon
@@ -783,23 +788,21 @@ const ManageOrders: React.FC = () => {
               </Tooltip>
             </>
           )}
-          <Tooltip
-            label="Delete Order"
-            disabled={"PLACED,PENDING".includes(row.status) ? false : true}
-          >
-            <ActionIcon
-              onClick={() => {
-                openDeleteModal(row.id);
-              }}
-            >
-              <IconTrash color="red" size="24px" stroke={1.5} />
-            </ActionIcon>
-          </Tooltip>
+          {"PLACED,PENDING".includes(row.status) && (
+            <Tooltip label="Delete Order">
+              <ActionIcon
+                onClick={() => {
+                  openDeleteModal(row.id);
+                }}
+              >
+                <IconTrash color="red" size="24px" stroke={1.5} />
+              </ActionIcon>
+            </Tooltip>
+          )}
         </Flex>
       </td>
     </tr>
   ));
-
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
       {/* Add order form modal */}
@@ -826,7 +829,7 @@ const ManageOrders: React.FC = () => {
                 w={"49%"}
               />
               <DatePicker
-                label="Expeted Delivery Date"
+                label="Expected Delivery Date"
                 placeholder="Enter Delivery Date"
                 inputFormat="YYYY-MM-DD"
                 onChange={(value) => {
@@ -966,7 +969,7 @@ const ManageOrders: React.FC = () => {
               }
             />
             <DatePicker
-              label="Expeted Delivery Date"
+              label="Expected Delivery Date"
               placeholder="Enter Delivery Date"
               inputFormat="YYYY-MM-DD"
               onChange={(value) => {
@@ -1068,7 +1071,11 @@ const ManageOrders: React.FC = () => {
             label="Select Status"
             description="When you crete a new order, it will be in placed status by default."
             data={[
-              { value: "PLACED", label: "Placed" },
+              { 
+                value: "PLACED", 
+                label: "Placed",
+                disabled: user.role === "SITE_MANAGER",
+              },
               {
                 value: "PENDING",
                 label: "Pending",

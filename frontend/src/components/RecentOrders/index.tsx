@@ -19,12 +19,12 @@ import {
 import { showNotification, updateNotification } from "@mantine/notifications";
 import ManagerAPI from "../../api/ManagerAPI";
 import { IconCheck } from "@tabler/icons";
+import { PurchaceOrderItems } from "../ManageOrders";
 
 //Interface for order data - (Raw data)
 interface RowData {
   id: string;
-  product: string;
-  quantity: string;
+  products: PurchaceOrderItems[];
   deliveryDate: string;
   site: string;
   status: string;
@@ -142,7 +142,7 @@ function Th({ children, reversed, sorted, onSort }: ThProps) {
 function filterData(data: RowData[], search: string) {
   const query = search.toLowerCase().trim();
   return data.filter((item) =>
-    keys(data[0]).some((key) => item[key].toLowerCase().includes(query))
+    keys(data[0]).some((key) => item[key].toString().toLowerCase().includes(query))
   );
 }
 
@@ -159,6 +159,7 @@ function sortData(
 
   return filterData(
     [...data].sort((a, b) => {
+      if (sortBy === "products") return 0;
       if (payload.reversed) {
         return b[sortBy].localeCompare(a[sortBy]);
       }
@@ -193,8 +194,7 @@ const ManageOrders: React.FC = () => {
       const data = result.map((item: any) => {
         return {
             id: item._id,
-            product: item.product,
-            quantity: item.quantity,
+            products: item.products,
             deliveryDate: item.deliveryDate,
             site: item.site,
             status: item.status,
@@ -268,23 +268,31 @@ const ManageOrders: React.FC = () => {
   //create rows
   const rows = sortedData.map((row) => (
     <tr key={row.id}>
-      <td>{products.find((product) => product.value === row.product)?.label}</td>
-      <td>{row.quantity}</td>
+      <td>{row.id.slice(0, 8).toUpperCase()}</td>
+      <td>
+        {row.products?.map((item) => (
+          <div key={item.product}>
+            {products.find((product) => product.value === item.product)?.label}{" "}
+            - {item.quantity}
+          </div>
+        ))}
+      </td>
       <td>{row.deliveryDate.slice(0, 10)}</td>
       <td>{sites.find((site) => site.value === row.site)?.label}</td>
-      <td>{
-        row.status === "placed" ? (
-            <Badge color="blue">Placed</Badge>
-        ) : row.status === "confirmed" ? (
-            <Badge color="green">Confirmed</Badge>
-        ) : row.status === "dispatched" ? (
-            <Badge color="yellow">Dispatched</Badge>
-        ) : row.status === "delivered" ? (
-            <Badge color="teal">Delivered</Badge>
+      <td>
+      {row.status === "PLACED" ? (
+          <Badge color="blue">Placed</Badge>
+        ) : row.status === "PENDING" ? (
+          <Badge color="orange">Pending</Badge>
+        ) : row.status === "APPROVED" ? (
+          <Badge color="green">Confirmed</Badge>
+        ) : row.status === "DISPATCHED" ? (
+          <Badge color="yellow">Dispatched</Badge>
+        ) : row.status === "DELIVERED" ? (
+          <Badge color="teal">Delivered</Badge>
         ) : (
-            <Badge color="red">Rejected</Badge>
-        )
-        }
+          <Badge color="red">Declined</Badge>
+        )}
       </td>
       <td>{managers.find((manager) => manager.id === row.updatedBy)?.name}</td>
     </tr>
@@ -304,19 +312,19 @@ const ManageOrders: React.FC = () => {
           >
             <thead>
               <tr>
-                <Th
-                  sorted={sortBy === "product"}
+              <Th
+                  sorted={sortBy === "id"}
                   reversed={reverseSortDirection}
-                  onSort={() => setSorting("product")}
+                  onSort={() => setSorting("id")}
                 >
-                  Product
+                  ID
                 </Th>
                 <Th
-                  sorted={sortBy === "quantity"}
+                  sorted={sortBy === "products"}
                   reversed={reverseSortDirection}
-                  onSort={() => setSorting("quantity")}
+                  onSort={() => setSorting("products")}
                 >
-                  Quantity
+                  Items
                 </Th>
                 <Th
                   sorted={sortBy === "deliveryDate"}
