@@ -728,18 +728,22 @@ const ManageOrders: React.FC = () => {
         ))}
       </td>
       <td>
-        {row.status === "PLACED" ? (
+      {row.status === "PLACED" ? (
           <Badge color="blue">Placed</Badge>
         ) : row.status === "PENDING" ? (
           <Badge color="orange">Pending</Badge>
         ) : row.status === "APPROVED" ? (
-          <Badge color="green">Confirmed</Badge>
+          <Badge color="green">Approved</Badge>
+        ) : row.status === "SUP_APPROVED" ? (
+            <Badge color="green">Supplier Approved</Badge>
         ) : row.status === "DISPATCHED" ? (
           <Badge color="yellow">Dispatched</Badge>
         ) : row.status === "DELIVERED" ? (
           <Badge color="teal">Delivered</Badge>
+        ) : row.status === "SUP_DECLINED" ? (
+            <Badge color="red">Supplier Declined</Badge>
         ) : (
-          <Badge color="red">Declined</Badge>
+          <Badge color="red">Declined</Badge> 
         )}
       </td>
       <td>{managers.find((manager) => manager.id === row.updatedBy)?.name}</td>
