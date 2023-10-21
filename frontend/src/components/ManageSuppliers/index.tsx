@@ -250,6 +250,7 @@ const ManageSuppliers: React.FC = () => {
     email: string;
     phone: string;
     address: string;
+    password : string;
   }) => {
     showNotification({
       id: "add-supplier",
@@ -376,6 +377,7 @@ const ManageSuppliers: React.FC = () => {
       email: "",
       phone: "",
       address: "",
+      password : "",
     },
     validate: {
       name: (value) =>
@@ -390,6 +392,7 @@ const ManageSuppliers: React.FC = () => {
         /^\d{10}$/.test(value)
           ? null
           : "Phone number must be 10 digits long number",
+      password : (values) => values.length < 8 ? "Password should have at least 8 characters" : null,
     },
   });
 
@@ -506,6 +509,12 @@ const ManageSuppliers: React.FC = () => {
             placeholder="Your Address"
             label="Address"
             {...addForm.getInputProps("address")}
+            required
+          />
+          <TextInput
+          label="Password"
+            placeholder="Password"
+            {...addForm.getInputProps("password")}
             required
           />
           <Button

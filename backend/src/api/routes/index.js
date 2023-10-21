@@ -20,6 +20,7 @@ const routes = (app) => {
 	app.get("/supplier/:id", protect.managerProtect, supplierController.getSupplierById);
 	app.put("/supplier/:id", protect.managerProtect, supplierController.updateSupplierById);
 	app.delete("/supplier/:id", protect.managerProtect, supplierController.deleteSupplierById);
+	app.post("/supplier/login",supplierController.supplierLogin);
 
 	// Site routes
 	app.post("/site", protect.managerProtect, siteController.insertSite);
@@ -41,7 +42,9 @@ const routes = (app) => {
 	app.get("/order/:id", protect.managerProtect, orderController.getOrderById);
 	app.put("/order/:id", protect.managerProtect, orderController.updateOrderById);
 	app.delete("/order/:id", protect.managerProtect, orderController.deleteOrderById);
-
+	app.get("/orders/accepted",protect.supplierProtect,orderController.getApprovedOrders);
+	app.put("/supplier/order/accept/:orderId",protect.supplierProtect,orderController.orderAcceptedBySupplier);
+	app.put("/supplier/order/decline/:orderId",protect.supplierProtect,orderController.orderDeclinedBySupplier);
 };
 
 export default routes;

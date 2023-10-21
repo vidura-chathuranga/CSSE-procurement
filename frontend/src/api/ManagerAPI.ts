@@ -68,6 +68,7 @@ class ManagerAPI {
     email: string;
     phone: string;
     address: string;
+    password : string;
   }) => {
     return axios.post(`${BASE_URL}/supplier`, values, requestConfigJson);
   };

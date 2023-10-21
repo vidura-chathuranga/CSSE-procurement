@@ -7,6 +7,8 @@ import ManageOrders from "./ManageOrders";
 import ManageProducts from "./ManageProducts";
 import ManagerSettings from "./ManagerSettings";
 import ManageSuppliers from "./ManageSuppliers";
+import SupplierDashboard from "./SupplierDashboard";
+
 export {
   Logout,
   ManagerSidebar,
@@ -17,4 +19,5 @@ export {
   ManageProducts,
   ManagerSettings,
   ManageSuppliers,
+  SupplierDashboard
 };
