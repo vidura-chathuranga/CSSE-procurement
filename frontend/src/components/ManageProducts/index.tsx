@@ -464,7 +464,6 @@ const ManageProducts: React.FC = () => {
         <td>{row.price}</td>
         <td>{row.description}</td>
         <td>{suppliers.find((supplier) => supplier.value === row.supplier)?.label}</td>
-        <td>{row.image}</td>
       <td>
         <Button
           color="teal"
@@ -535,12 +534,6 @@ const ManageProducts: React.FC = () => {
             {...addForm.getInputProps("supplier")}
             required
           />
-            <TextInput
-            placeholder="Image"
-            label="Image"
-            {...addForm.getInputProps("image")}
-            required
-            />
           <Button
             color="teal"
             sx={{ marginTop: "10px", width: "100%" }}
@@ -602,12 +595,6 @@ const ManageProducts: React.FC = () => {
             {...editForm.getInputProps("supplier")}
             required
           />
-            <TextInput
-            placeholder="Image"
-            label="Enter image"
-            {...editForm.getInputProps("image")}
-            required
-            />
           <Button
             color="teal"
             sx={{ marginTop: "10px", width: "100%" }}
@@ -682,13 +669,6 @@ const ManageProducts: React.FC = () => {
                   onSort={() => setSorting("supplier")}
                 >
                   Supplier
-                </Th>
-                <Th
-                  sorted={sortBy === "image"}
-                  reversed={reverseSortDirection}
-                  onSort={() => setSorting("image")}
-                >
-                  Image
                 </Th>
                 <th>Action</th>
               </tr>
